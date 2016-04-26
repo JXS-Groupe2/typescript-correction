@@ -42,7 +42,7 @@ export class Game {
             }
 
         }).bind(this);
-        
+
         animationLoop();
     }
 
