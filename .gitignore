@@ -35,5 +35,5 @@ node_modules
 
 .idea/
 dist/
-*.js
+src/*.js
 *.map
