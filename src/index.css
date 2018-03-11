@@ -1,4 +1,11 @@
 #snakeGame {
-    width: 400px;
-    height: 250px;
+  width: 400px;
+  height: 250px;
+}
+
+#score {
+  padding-left: 390px;
+  font-size: 24px;
+  color: #008AFD;
+  font-weight: bold;
 }
