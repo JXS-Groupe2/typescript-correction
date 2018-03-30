@@ -1,8 +1,8 @@
 import { Coordinates2D } from "./Snake";
-import { DrawablePart } from "./DrawablePart";
+import { DrawableRectangle } from "./DrawablePart";
 
-export class Food extends DrawablePart {
-  constructor(public coordinates: Coordinates2D, gridSize: number) {
-    super(coordinates, gridSize, 1, 'red', 'red')
+export class Food extends DrawableRectangle {
+  constructor(public coordinates: Coordinates2D) {
+    super(coordinates, 1, 'red', 'red')
   }
 }

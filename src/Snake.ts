@@ -16,43 +16,38 @@ export class Snake {
 
   constructor(
     public parts: Array<SnakePart>,
-    private gridSize: number,
-    private gridWidth: number,
-    private gridHeight: number,
     public direction: SnakeDirection = SnakeDirection.UP
   ) {}
 
-  static newOfSize(size: number, origin: Coordinates2D, gridSize: number, gridWidth: number, gridHeight: number): Snake {
+  static newOfSize(size: number, origin: Coordinates2D, outbounds: Coordinates2D): Snake {
     let parts = new Array<SnakePart>()
 
     for(let i = 0; i < size; i++) {
-      const coordinates = new Coordinates2D(origin.x, (origin.y + i) % gridHeight)
-      parts.push(new SnakePart(coordinates, gridSize, gridWidth, gridHeight))
+      const coordinates = new Coordinates2D(origin.x, (origin.y + i) % outbounds.y)
+      parts.push(new SnakePart(coordinates))
     }
 
-    return new Snake(parts, gridSize, gridWidth, gridHeight)
+    return new Snake(parts)
   }
 
   head(): SnakePart { return this.parts[0] }
   tail(): Array<SnakePart> { return this.parts.slice(1) }
   previous(part: SnakePart): SnakePart { return this.parts[this.parts.indexOf(part) - 1] }
 
-  setDirection(direction: SnakeDirection): void {
-    this.direction = direction
+  withDirection(direction: SnakeDirection): Snake {
+    return new Snake(this.parts, direction)
   }
 
-  move(): Snake {
-    const newHead = this.head().moveTo(this.computeNextHeadPosition())
-
+  move(outbounds: Coordinates2D): Snake {
     const parts = new Array<SnakePart>()
+    const newHead = this.head().moveTo(this.computeNextHeadPosition(outbounds))
     parts.push(newHead)
-
-    this.tail().forEach((part) => parts.push(part.moveTo(this.previous(part).coordinates)))
-    return new Snake(parts, this.gridSize, this.gridWidth, this.gridHeight, this.direction)
+    this.parts.slice(0, this.parts.length - 1).forEach((part) => parts.push(part))
+    return new Snake(parts, this.direction)
   }
 
   grow(): void {
-    this.parts.push(new SnakePart(new Coordinates2D(-1, -1), this.gridSize, this.gridWidth, this.gridHeight))
+    this.parts.push(new SnakePart(new Coordinates2D(-1, -1)))
   }
 
   private computeHeadMovement(): Coordinates2D {
@@ -61,21 +56,22 @@ export class Snake {
     return new Coordinates2D(x, y)
   }
 
-  private computeNextHeadPosition(): Coordinates2D {
+  private computeNextHeadPosition(outbounds: Coordinates2D): Coordinates2D {
     const headMovement = this.computeHeadMovement()
 
     const x = (this.head().coordinates.x + headMovement.x)
     const y = (this.head().coordinates.y + headMovement.y)
 
     return new Coordinates2D(
-      x >= 0 ? x % this.gridWidth : this.gridWidth + x,
-      y >= 0 ? y % this.gridHeight : this.gridHeight + y
+      x >= 0 ? x % outbounds.x : outbounds.x + x,
+      y >= 0 ? y % outbounds.y : outbounds.y + y
     )
   }
 
-  draw(canvasContext : CanvasRenderingContext2D): void {
-    this.parts.forEach((part) => part.draw(canvasContext))
+  draw(canvasContext : CanvasRenderingContext2D, sideLength: number): void {
+    this.parts.forEach((part) => part.draw(canvasContext, sideLength))
   }
+
 }
 
 export enum SnakeDirection { UP = 38, DOWN = 40, RIGHT = 39, LEFT = 37 }
